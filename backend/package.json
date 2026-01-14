@@ -1,12 +1,15 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "API de Agendamento de Exames - Aspect Challenge",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
-  "keywords": [],
+  "keywords": ["typescript", "express", "typeorm", "postgresql"],
   "author": "",
   "license": "ISC",
   "dependencies": {
