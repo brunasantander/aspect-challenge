@@ -1,22 +1,24 @@
 import React, { useState } from "react";
-import { useAppointments } from "../context/AppointmentContext";
+import { useAppointments } from "../../context/AppointmentContext";
 import {
   Appointment,
   AppointmentStatus,
   statusLabels,
   statusColors,
-} from "../types";
-import ConfirmModal from "./ConfirmModal";
-import "./AppointmentList.css";
+} from "../../types";
+import { appointmentListStyles } from "./styles";
+import ConfirmModal from "../ConfirmModal";
 
 const AppointmentList: React.FC = () => {
-  const { state, deleteAppointment, updateAppointmentStatus } = useAppointments();
+  const { state, deleteAppointment, updateAppointmentStatus } =
+    useAppointments();
   const { appointments, isLoading, error } = state;
   const [filter, setFilter] = useState<AppointmentStatus | "all">("all");
 
   // Estado do modal
   const [modalOpen, setModalOpen] = useState(false);
-  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
+  const [appointmentToDelete, setAppointmentToDelete] =
+    useState<Appointment | null>(null);
 
   const filteredAppointments =
     filter === "all"
@@ -79,17 +81,19 @@ const AppointmentList: React.FC = () => {
 
   if (isLoading && appointments.length === 0) {
     return (
-      <div className="appointment-list-container">
-        <div className="loading">Carregando agendamentos...</div>
+      <div className={appointmentListStyles.container}>
+        <div className={appointmentListStyles.loading}>
+          Carregando agendamentos...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="appointment-list-container">
-      <div className="list-header">
+    <div className={appointmentListStyles.container}>
+      <div className={appointmentListStyles.listHeader}>
         <h2>Agendamentos</h2>
-        <div className="filter-container">
+        <div className={appointmentListStyles.filterContainer}>
           <select
             value={filter}
             onChange={(e) =>
@@ -106,61 +110,77 @@ const AppointmentList: React.FC = () => {
         </div>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className={appointmentListStyles.errorMessage}>{error}</div>
+      )}
 
       {filteredAppointments.length === 0 ? (
-        <div className="empty-state">
+        <div className={appointmentListStyles.emptyState}>
           <p>Nenhum agendamento encontrado.</p>
         </div>
       ) : (
-        <div className="appointments-grid">
+        <div className={appointmentListStyles.appointmentsGrid}>
           {filteredAppointments.map((appointment) => (
             <div
               key={appointment.id}
-              className={`appointment-card ${
-                isPastDate(appointment.dateTime) ? "past" : ""
-              }`}
+              className={
+                isPastDate(appointment.dateTime)
+                  ? appointmentListStyles.appointmentCardPast
+                  : appointmentListStyles.appointmentCard
+              }
             >
-              <div className="card-header">
+              <div className={appointmentListStyles.cardHeader}>
                 <span
-                  className="status-badge"
+                  className={appointmentListStyles.statusBadge}
                   style={{ backgroundColor: statusColors[appointment.status] }}
                 >
                   {statusLabels[appointment.status]}
                 </span>
-                <span className="appointment-date">
+                <span className={appointmentListStyles.appointmentDate}>
                   {formatDate(appointment.dateTime)}
                 </span>
               </div>
 
-              <div className="card-body">
-                <h3 className="exam-name">{appointment.exam.name}</h3>
-                <p className="specialty">{appointment.exam.specialty}</p>
+              <div className={appointmentListStyles.cardBody}>
+                <h3 className={appointmentListStyles.examName}>
+                  {appointment.exam.name}
+                </h3>
+                <p className={appointmentListStyles.specialty}>
+                  {appointment.exam.specialty}
+                </p>
 
-                <div className="patient-info">
-                  <p className="patient-name">{appointment.patientName}</p>
-                  <p className="patient-email">{appointment.patientEmail}</p>
+                <div className={appointmentListStyles.patientInfo}>
+                  <p className={appointmentListStyles.patientName}>
+                    {appointment.patientName}
+                  </p>
+                  <p className={appointmentListStyles.patientEmail}>
+                    {appointment.patientEmail}
+                  </p>
                   {appointment.patientPhone && (
-                    <p className="patient-phone">{appointment.patientPhone}</p>
+                    <p className={appointmentListStyles.patientPhone}>
+                      {appointment.patientPhone}
+                    </p>
                   )}
                 </div>
 
-                <div className="time-info">
-                  <span className="time">{formatTime(appointment.dateTime)}</span>
+                <div className={appointmentListStyles.timeInfo}>
+                  <span className={appointmentListStyles.time}>
+                    {formatTime(appointment.dateTime)}
+                  </span>
                 </div>
 
                 {appointment.notes && (
-                  <p className="notes">
+                  <p className={appointmentListStyles.notes}>
                     <strong>Obs:</strong> {appointment.notes}
                   </p>
                 )}
               </div>
 
-              <div className="card-actions">
+              <div className={appointmentListStyles.cardActions}>
                 {appointment.status === AppointmentStatus.SCHEDULED && (
                   <>
                     <button
-                      className="btn-confirm"
+                      className={appointmentListStyles.btnConfirm}
                       onClick={() =>
                         handleStatusChange(
                           appointment.id,
@@ -171,7 +191,7 @@ const AppointmentList: React.FC = () => {
                       Confirmar
                     </button>
                     <button
-                      className="btn-cancel"
+                      className={appointmentListStyles.btnCancel}
                       onClick={() =>
                         handleStatusChange(
                           appointment.id,
@@ -185,7 +205,7 @@ const AppointmentList: React.FC = () => {
                 )}
                 {appointment.status === AppointmentStatus.CONFIRMED && (
                   <button
-                    className="btn-complete"
+                    className={appointmentListStyles.btnComplete}
                     onClick={() =>
                       handleStatusChange(
                         appointment.id,
@@ -197,7 +217,7 @@ const AppointmentList: React.FC = () => {
                   </button>
                 )}
                 <button
-                  className="btn-delete"
+                  className={appointmentListStyles.btnDelete}
                   onClick={() => handleDeleteClick(appointment)}
                 >
                   Excluir

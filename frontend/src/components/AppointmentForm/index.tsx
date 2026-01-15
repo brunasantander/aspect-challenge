@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useAppointments } from "../context/AppointmentContext";
-import { Exam, CreateAppointmentDTO } from "../types";
-import "./AppointmentForm.css";
+import { appointmentFormStyles } from "./styles";
+import { CreateAppointmentDTO, Exam } from "../../types";
+import { useAppointments } from "../../context/AppointmentContext";
 
 interface AppointmentFormProps {
   selectedExam?: Exam | null;
@@ -73,7 +73,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
     if (numbers.length <= 7) {
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
     }
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
+      7,
+      11
+    )}`;
   };
 
   const handleChange = (
@@ -134,15 +137,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
   };
 
   return (
-    <div className="appointment-form-container">
+    <div className={appointmentFormStyles.container}>
       <h2>Agendar Exame</h2>
 
       {successMessage && (
-        <div className="success-message">{successMessage}</div>
+        <div className={appointmentFormStyles.successMessage}>
+          {successMessage}
+        </div>
       )}
 
-      <form onSubmit={handleSubmit} className="appointment-form">
-        <div className="form-group">
+      <form onSubmit={handleSubmit} className={appointmentFormStyles.form}>
+        <div className={appointmentFormStyles.formGroup}>
           <label htmlFor="patientName">Nome do Paciente *</label>
           <input
             type="text"
@@ -151,15 +156,19 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             value={formData.patientName}
             onChange={handleChange}
             placeholder="Digite o nome completo"
-            className={errors.patientName ? "error" : ""}
+            className={
+              errors.patientName ? appointmentFormStyles.errorInput : ""
+            }
           />
           {errors.patientName && (
-            <span className="error-text">{errors.patientName}</span>
+            <span className={appointmentFormStyles.errorText}>
+              {errors.patientName}
+            </span>
           )}
         </div>
 
-        <div className="form-row">
-          <div className="form-group">
+        <div className={appointmentFormStyles.formRow}>
+          <div className={appointmentFormStyles.formGroup}>
             <label htmlFor="patientEmail">E-mail *</label>
             <input
               type="email"
@@ -168,14 +177,18 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               value={formData.patientEmail}
               onChange={handleChange}
               placeholder="email@exemplo.com"
-              className={errors.patientEmail ? "error" : ""}
+              className={
+                errors.patientEmail ? appointmentFormStyles.errorInput : ""
+              }
             />
             {errors.patientEmail && (
-              <span className="error-text">{errors.patientEmail}</span>
+              <span className={appointmentFormStyles.errorText}>
+                {errors.patientEmail}
+              </span>
             )}
           </div>
 
-          <div className="form-group">
+          <div className={appointmentFormStyles.formGroup}>
             <label htmlFor="patientPhone">Telefone</label>
             <input
               type="tel"
@@ -189,29 +202,32 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
           </div>
         </div>
 
-        <div className="form-group">
+        <div className={appointmentFormStyles.formGroup}>
           <label htmlFor="examId">Exame *</label>
           <select
             id="examId"
             name="examId"
             value={formData.examId}
             onChange={handleChange}
-            className={errors.examId ? "error" : ""}
+            className={errors.examId ? appointmentFormStyles.errorInput : ""}
           >
             <option value={0}>Selecione um exame</option>
             {exams.map((exam) => (
               <option key={exam.id} value={exam.id}>
                 {exam.name} - {exam.specialty}
-                {exam.price && ` (R$ ${Number(exam.price).toFixed(2).replace(".", ",")})`}
+                {exam.price &&
+                  ` (R$ ${Number(exam.price).toFixed(2).replace(".", ",")})`}
               </option>
             ))}
           </select>
           {errors.examId && (
-            <span className="error-text">{errors.examId}</span>
+            <span className={appointmentFormStyles.errorText}>
+              {errors.examId}
+            </span>
           )}
         </div>
 
-        <div className="form-group">
+        <div className={appointmentFormStyles.formGroup}>
           <label htmlFor="dateTime">Data e Hora *</label>
           <input
             type="datetime-local"
@@ -220,14 +236,16 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             value={formData.dateTime}
             onChange={handleChange}
             min={getMinDateTime()}
-            className={errors.dateTime ? "error" : ""}
+            className={errors.dateTime ? appointmentFormStyles.errorInput : ""}
           />
           {errors.dateTime && (
-            <span className="error-text">{errors.dateTime}</span>
+            <span className={appointmentFormStyles.errorText}>
+              {errors.dateTime}
+            </span>
           )}
         </div>
 
-        <div className="form-group">
+        <div className={appointmentFormStyles.formGroup}>
           <label htmlFor="notes">Observações</label>
           <textarea
             id="notes"
@@ -239,7 +257,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
           />
         </div>
 
-        <button type="submit" className="submit-btn" disabled={isLoading}>
+        <button
+          type="submit"
+          className={appointmentFormStyles.submitBtn}
+          disabled={isLoading}
+        >
           {isLoading ? "Agendando..." : "Confirmar Agendamento"}
         </button>
       </form>

@@ -1,14 +1,17 @@
 import React from "react";
-import { useAppointments } from "../context/AppointmentContext";
-import { Exam } from "../types";
-import "./ExamList.css";
+import { examListStyles } from "./styles";
+import { useAppointments } from "../../context/AppointmentContext";
+import { Exam } from "../../types";
 
 interface ExamListProps {
   onSelectExam?: (exam: Exam) => void;
   selectedExamId?: number;
 }
 
-const ExamList: React.FC<ExamListProps> = ({ onSelectExam, selectedExamId }) => {
+const ExamList: React.FC<ExamListProps> = ({
+  onSelectExam,
+  selectedExamId,
+}) => {
   const { state } = useAppointments();
   const { exams, isLoading } = state;
 
@@ -23,33 +26,37 @@ const ExamList: React.FC<ExamListProps> = ({ onSelectExam, selectedExamId }) => 
 
   if (isLoading && exams.length === 0) {
     return (
-      <div className="exam-list-container">
-        <div className="loading">Carregando exames...</div>
+      <div className={examListStyles.container}>
+        <div className={examListStyles.loading}>Carregando exames...</div>
       </div>
     );
   }
 
   return (
-    <div className="exam-list-container">
+    <div className={examListStyles.container}>
       <h2>Exames Disponíveis</h2>
       {Object.entries(examsBySpecialty).map(([specialty, specialtyExams]) => (
-        <div key={specialty} className="specialty-group">
-          <h3 className="specialty-title">{specialty}</h3>
-          <div className="exam-grid">
+        <div key={specialty} className={examListStyles.specialtyGroup}>
+          <h3 className={examListStyles.specialtyTitle}>{specialty}</h3>
+          <div className={examListStyles.examGrid}>
             {specialtyExams.map((exam) => (
               <div
                 key={exam.id}
-                className={`exam-card ${
-                  selectedExamId === exam.id ? "selected" : ""
-                }`}
+                className={
+                  selectedExamId === exam.id
+                    ? examListStyles.examCardSelected
+                    : examListStyles.examCard
+                }
                 onClick={() => onSelectExam?.(exam)}
               >
-                <h4 className="exam-name">{exam.name}</h4>
+                <h4 className={examListStyles.examName}>{exam.name}</h4>
                 {exam.description && (
-                  <p className="exam-description">{exam.description}</p>
+                  <p className={examListStyles.examDescription}>
+                    {exam.description}
+                  </p>
                 )}
                 {exam.price && (
-                  <p className="exam-price">
+                  <p className={examListStyles.examPrice}>
                     R$ {Number(exam.price).toFixed(2).replace(".", ",")}
                   </p>
                 )}

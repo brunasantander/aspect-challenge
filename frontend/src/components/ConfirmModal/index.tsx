@@ -1,5 +1,5 @@
 import React from "react";
-import "./ConfirmModal.css";
+import { confirmModalStyles } from "./styles";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -30,20 +30,33 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     }
   };
 
+  const getConfirmButtonClass = () => {
+    switch (variant) {
+      case "danger":
+        return confirmModalStyles.btnConfirmDanger;
+      case "warning":
+        return confirmModalStyles.btnConfirmWarning;
+      case "info":
+        return confirmModalStyles.btnConfirmInfo;
+      default:
+        return confirmModalStyles.btnConfirm;
+    }
+  };
+
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-container">
-        <div className="modal-header">
+    <div className={confirmModalStyles.overlay} onClick={handleOverlayClick}>
+      <div className={confirmModalStyles.container}>
+        <div className={confirmModalStyles.header}>
           <h3>{title}</h3>
         </div>
-        <div className="modal-body">
+        <div className={confirmModalStyles.body}>
           <p>{message}</p>
         </div>
-        <div className="modal-footer">
-          <button className="btn-cancel" onClick={onCancel}>
+        <div className={confirmModalStyles.footer}>
+          <button className={confirmModalStyles.btnCancel} onClick={onCancel}>
             {cancelText}
           </button>
-          <button className={`btn-confirm ${variant}`} onClick={onConfirm}>
+          <button className={getConfirmButtonClass()} onClick={onConfirm}>
             {confirmText}
           </button>
         </div>
