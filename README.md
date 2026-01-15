@@ -5,18 +5,21 @@ Sistema completo para agendamento de exames médicos, desenvolvido como desafio 
 ## Tecnologias Utilizadas
 
 ### Backend
+
 - **Node.js** + **TypeScript**
 - **Express** - Framework web
 - **TypeORM** - ORM para banco de dados
 - **PostgreSQL** - Banco de dados relacional
 
 ### Frontend
+
 - **React** + **TypeScript**
 - **Context API** - Gerenciamento de estado
 - **Axios** - Cliente HTTP
 - **CSS3** - Estilização responsiva
 
 ### DevOps
+
 - **Docker** + **Docker Compose**
 
 ## Funcionalidades
@@ -83,6 +86,9 @@ cd frontend
 # Instalar dependências
 npm install
 
+# Configurar variáveis de ambiente
+cp .env.example .env
+
 # Rodar em desenvolvimento
 npm start
 ```
@@ -114,28 +120,29 @@ REACT_APP_API_URL=http://localhost:3001/api
 
 ### Exames
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/api/exams` | Listar todos os exames |
-| GET | `/api/exams/:id` | Buscar exame por ID |
-| POST | `/api/exams` | Criar novo exame |
-| PUT | `/api/exams/:id` | Atualizar exame |
-| DELETE | `/api/exams/:id` | Deletar exame |
+| Método | Endpoint         | Descrição              |
+| ------ | ---------------- | ---------------------- |
+| GET    | `/api/exams`     | Listar todos os exames |
+| GET    | `/api/exams/:id` | Buscar exame por ID    |
+| POST   | `/api/exams`     | Criar novo exame       |
+| PUT    | `/api/exams/:id` | Atualizar exame        |
+| DELETE | `/api/exams/:id` | Deletar exame          |
 
 ### Agendamentos
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/api/appointments` | Listar agendamentos |
-| GET | `/api/appointments/:id` | Buscar agendamento por ID |
-| POST | `/api/appointments` | Criar agendamento |
-| PUT | `/api/appointments/:id` | Atualizar agendamento |
-| PATCH | `/api/appointments/:id/status` | Atualizar status |
-| DELETE | `/api/appointments/:id` | Deletar agendamento |
+| Método | Endpoint                       | Descrição                 |
+| ------ | ------------------------------ | ------------------------- |
+| GET    | `/api/appointments`            | Listar agendamentos       |
+| GET    | `/api/appointments/:id`        | Buscar agendamento por ID |
+| POST   | `/api/appointments`            | Criar agendamento         |
+| PUT    | `/api/appointments/:id`        | Atualizar agendamento     |
+| PATCH  | `/api/appointments/:id/status` | Atualizar status          |
+| DELETE | `/api/appointments/:id`        | Deletar agendamento       |
 
 ### Exemplos de Requisições
 
 **Criar Agendamento:**
+
 ```json
 POST /api/appointments
 {
@@ -149,6 +156,7 @@ POST /api/appointments
 ```
 
 **Atualizar Status:**
+
 ```json
 PATCH /api/appointments/1/status
 {
