@@ -1,0 +1,250 @@
+import React, { useState, useEffect } from "react";
+import { useAppointments } from "../context/AppointmentContext";
+import { Exam, CreateAppointmentDTO } from "../types";
+import "./AppointmentForm.css";
+
+interface AppointmentFormProps {
+  selectedExam?: Exam | null;
+  onSuccess?: () => void;
+}
+
+const AppointmentForm: React.FC<AppointmentFormProps> = ({
+  selectedExam,
+  onSuccess,
+}) => {
+  const { state, createAppointment } = useAppointments();
+  const { exams, isLoading } = state;
+
+  const [formData, setFormData] = useState<CreateAppointmentDTO>({
+    patientName: "",
+    patientEmail: "",
+    patientPhone: "",
+    examId: 0,
+    dateTime: "",
+    notes: "",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // Atualizar examId quando um exame for selecionado
+  useEffect(() => {
+    if (selectedExam) {
+      setFormData((prev) => ({ ...prev, examId: selectedExam.id }));
+    }
+  }, [selectedExam]);
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.patientName.trim()) {
+      newErrors.patientName = "Nome do paciente é obrigatório";
+    }
+
+    if (!formData.patientEmail.trim()) {
+      newErrors.patientEmail = "E-mail é obrigatório";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.patientEmail)) {
+      newErrors.patientEmail = "E-mail inválido";
+    }
+
+    if (!formData.examId) {
+      newErrors.examId = "Selecione um exame";
+    }
+
+    if (!formData.dateTime) {
+      newErrors.dateTime = "Data e hora são obrigatórios";
+    } else {
+      const selectedDate = new Date(formData.dateTime);
+      if (selectedDate <= new Date()) {
+        newErrors.dateTime = "A data deve ser futura";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Função para formatar telefone no padrão (11) 99999-9999
+  const formatPhone = (value: string): string => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 2) {
+      return numbers.length ? `(${numbers}` : "";
+    }
+    if (numbers.length <= 7) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    }
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    let newValue: string | number = value;
+
+    if (name === "examId") {
+      newValue = parseInt(value);
+    } else if (name === "patientPhone") {
+      newValue = formatPhone(value);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+    // Limpar erro do campo ao digitar
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccessMessage("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      await createAppointment(formData);
+      setSuccessMessage("Agendamento realizado com sucesso!");
+      setFormData({
+        patientName: "",
+        patientEmail: "",
+        patientPhone: "",
+        examId: 0,
+        dateTime: "",
+        notes: "",
+      });
+      onSuccess?.();
+    } catch (error) {
+      // Erro já tratado no contexto
+    }
+  };
+
+  // Data mínima para agendamento (próxima hora cheia)
+  const getMinDateTime = () => {
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    now.setMinutes(0);
+    return now.toISOString().slice(0, 16);
+  };
+
+  return (
+    <div className="appointment-form-container">
+      <h2>Agendar Exame</h2>
+
+      {successMessage && (
+        <div className="success-message">{successMessage}</div>
+      )}
+
+      <form onSubmit={handleSubmit} className="appointment-form">
+        <div className="form-group">
+          <label htmlFor="patientName">Nome do Paciente *</label>
+          <input
+            type="text"
+            id="patientName"
+            name="patientName"
+            value={formData.patientName}
+            onChange={handleChange}
+            placeholder="Digite o nome completo"
+            className={errors.patientName ? "error" : ""}
+          />
+          {errors.patientName && (
+            <span className="error-text">{errors.patientName}</span>
+          )}
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="patientEmail">E-mail *</label>
+            <input
+              type="email"
+              id="patientEmail"
+              name="patientEmail"
+              value={formData.patientEmail}
+              onChange={handleChange}
+              placeholder="email@exemplo.com"
+              className={errors.patientEmail ? "error" : ""}
+            />
+            {errors.patientEmail && (
+              <span className="error-text">{errors.patientEmail}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="patientPhone">Telefone</label>
+            <input
+              type="tel"
+              id="patientPhone"
+              name="patientPhone"
+              value={formData.patientPhone}
+              onChange={handleChange}
+              placeholder="(11) 99999-9999"
+              maxLength={15}
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="examId">Exame *</label>
+          <select
+            id="examId"
+            name="examId"
+            value={formData.examId}
+            onChange={handleChange}
+            className={errors.examId ? "error" : ""}
+          >
+            <option value={0}>Selecione um exame</option>
+            {exams.map((exam) => (
+              <option key={exam.id} value={exam.id}>
+                {exam.name} - {exam.specialty}
+                {exam.price && ` (R$ ${Number(exam.price).toFixed(2).replace(".", ",")})`}
+              </option>
+            ))}
+          </select>
+          {errors.examId && (
+            <span className="error-text">{errors.examId}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="dateTime">Data e Hora *</label>
+          <input
+            type="datetime-local"
+            id="dateTime"
+            name="dateTime"
+            value={formData.dateTime}
+            onChange={handleChange}
+            min={getMinDateTime()}
+            className={errors.dateTime ? "error" : ""}
+          />
+          {errors.dateTime && (
+            <span className="error-text">{errors.dateTime}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="notes">Observações</label>
+          <textarea
+            id="notes"
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+            placeholder="Informações adicionais (opcional)"
+            rows={3}
+          />
+        </div>
+
+        <button type="submit" className="submit-btn" disabled={isLoading}>
+          {isLoading ? "Agendando..." : "Confirmar Agendamento"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default AppointmentForm;
